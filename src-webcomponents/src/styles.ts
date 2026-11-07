@@ -1,6 +1,8 @@
 /**
  * The styles of the shadow root. The element fills the box of the host; it has a transparent background and
- * inherits `color` and `font`, so it follows the theme of the host.
+ * inherits `color` and `font`, so it follows the theme of the host. The rest of the theme - the primary color for the
+ * accent, the colors of a panel - comes as the CSS variables `--iob-*` that the base class sets on the element, with
+ * `color-scheme` for the list of the sources.
  *
  * Which layout (`wide`, `card`, `tall`, `row`) and how big the parts are is decided in `layout.ts` from the
  * measured size of the box; the sizes come in as variables: `--pad`, `--gap`, `--icon`, `--cover` and `--fs-*`.
@@ -103,9 +105,94 @@ export const STYLES = `
 .name {
     font-size: var(--fs-name);
     line-height: 1.4;
-    opacity: 0.6;
     letter-spacing: 0.04em;
     text-transform: uppercase;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5em;
+}
+/* the name line holds the list of the sources and the button of the library, which may be a bit higher */
+.player .name {
+    overflow: visible;
+}
+.name .library {
+    flex: none;
+    margin: -0.25em 0 -0.25em auto;
+    padding: 0.1em;
+    border-radius: 4px;
+    opacity: 0.75;
+}
+.name .library:hover:not(:disabled) {
+    opacity: 1;
+}
+.name .library svg {
+    width: 1.5em;
+    height: 1.5em;
+}
+.tall .name .library {
+    margin-left: 0;
+}
+.name .label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    opacity: 0.6;
+}
+.tall .name {
+    justify-content: center;
+}
+/* the source after the name: a list box of the browser that looks like the text, with an arrow */
+.source {
+    position: relative;
+    flex: 0 1 auto;
+    min-width: 3em;
+    max-width: 60%;
+    display: inline-flex;
+    align-items: center;
+}
+.source select {
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    color: var(--accent);
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    margin: 0;
+    padding: 0 1.3em 0 0.3em;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+}
+.source select:hover:not(:disabled) {
+    background: var(--hover);
+}
+.source select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 0;
+}
+.source select:disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+/* the list itself is drawn by the browser: in the colors of a panel of the host, not in the inherited color */
+.source option {
+    color: var(--iob-text, CanvasText);
+    background-color: var(--iob-paper, Canvas);
+    text-transform: none;
+}
+.source svg {
+    position: absolute;
+    right: 0;
+    width: 1.3em;
+    height: 1.3em;
+    fill: var(--accent);
+    pointer-events: none;
 }
 .title {
     font-size: var(--fs-title);

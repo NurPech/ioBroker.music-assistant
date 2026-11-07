@@ -16,6 +16,16 @@ export interface PlayerMedia {
     elapsed_time?: number;
 }
 
+/** A native source of a player, e.g. Spotify Connect, AirPlay or a line input */
+export interface PlayerSource {
+    /** What `players/cmd/select_source` takes */
+    id: string;
+    /** Shown to the user */
+    name: string;
+    /** Cannot be selected by Music Assistant or the user, only be active */
+    passive?: boolean;
+}
+
 /** A player of Music Assistant */
 export interface Player {
     /** Unique id of the player */
@@ -34,10 +44,10 @@ export interface Player {
     volume_level: number | null;
     /** Whether the player is muted, `null` if the player has no mute control */
     volume_muted: boolean | null;
-    /** Id of the active source, `null` if there is none */
+    /** A source of `source_list`, or the ID of the queue that plays (the own queue has the ID of the player) */
     active_source: string | null;
-    /** The sources the player offers */
-    source_list?: string[];
+    /** The native sources the player offers */
+    source_list?: PlayerSource[];
     /** The media the player currently plays, `null` if nothing plays */
     current_media: PlayerMedia | null;
     /** Id of the leader this player is synced to, `null` or unset if it is not a sync member */

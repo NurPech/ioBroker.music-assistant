@@ -27,6 +27,16 @@ export interface PlayerValues {
     artist: string;
     album: string;
     image: string;
+    /** ID of the active source; the own queue has the ID of the player */
+    source: string;
+    /** The sources to choose from, the own queue first */
+    sources: PlayerSource[];
+}
+
+/** A source of the player: its own queue of Music Assistant or a native one (Spotify Connect, AirPlay, ...) */
+export interface PlayerSource {
+    id: string;
+    name: string;
 }
 
 export interface PlayerViewProps {
@@ -34,7 +44,11 @@ export interface PlayerViewProps {
     showCover: boolean;
     showVolume: boolean;
     showModes: boolean;
-    /** Color of the sliders and the active buttons; the color of the text if empty */
+    /** The choice of the source, if the player has more than its own queue */
+    showSource: boolean;
+    /** Opens the library of Music Assistant; no button without it */
+    onLibrary?: () => void;
+    /** Color of the sliders and the active buttons; the primary color of the host if empty */
     accent?: string;
     editMode: boolean;
     word: (key: WordKey) => string;
@@ -119,6 +133,61 @@ function Slider({ value, max, label, disabled, onCommit }: SliderProps): JSX.Ele
                 setLocal(Number(e.currentTarget.value));
             }}
         />
+    );
+}
+
+interface SourceSelectProps {
+    value: string;
+    sources: PlayerSource[];
+    label: string;
+    disabled: boolean;
+    onSelect: (id: string) => void;
+}
+
+/**
+ * The source as a small list box after the name of the player. The list is the one of the browser - on a phone
+ * its picker. What the user picked stays shown until the state follows, at most a few seconds.
+ */
+function SourceSelect({ value, sources, label, disabled, onSelect }: SourceSelectProps): JSX.Element {
+    const [picked, setPicked] = useState<{ id: string; was: string } | null>(null);
+
+    useEffect(() => {
+        if (!picked) {
+            return undefined;
+        }
+        const timer = setTimeout(() => setPicked(null), 5000);
+        return () => clearTimeout(timer);
+    }, [picked]);
+
+    // the state has moved on: show it
+    const shown = picked && picked.was === value ? picked.id : value;
+    // an active source the adapter has not named yet is shown with its ID
+    const options = sources.some(s => s.id === shown) ? sources : [...sources, { id: shown, name: shown }];
+
+    return (
+        <span className="source">
+            <select
+                value={shown}
+                title={label}
+                aria-label={label}
+                disabled={disabled}
+                onChange={e => {
+                    const id = e.currentTarget.value;
+                    setPicked({ id, was: value });
+                    onSelect(id);
+                }}
+            >
+                {options.map(source => (
+                    <option
+                        key={source.id}
+                        value={source.id}
+                    >
+                        {source.name}
+                    </option>
+                ))}
+            </select>
+            <Icon name="dropDown" />
+        </span>
     );
 }
 
@@ -208,7 +277,8 @@ export function PlayerView(props: PlayerViewProps): JSX.Element {
         : null;
 
     const classes = ['player'];
-    const style: Record<string, string> = { '--accent': props.accent || 'currentColor' };
+    // `--iob-primary` and the other colors of the host are set on the element by the base class
+    const style: Record<string, string> = { '--accent': props.accent || 'var(--iob-primary, currentColor)' };
     if (layout) {
         classes.push(layout.kind);
         style['--pad'] = `${layout.pad}px`;
@@ -231,12 +301,40 @@ export function PlayerView(props: PlayerViewProps): JSX.Element {
     if (layout) {
         const cover = layout.cover ? <Cover image={values.image} /> : null;
 
+        // only worth a choice if the player has a native source besides its own queue
+        const library = props.onLibrary ? (
+            <button
+                className="library"
+                title={word('library')}
+                aria-label={word('library')}
+                disabled={disabled}
+                onClick={props.onLibrary}
+            >
+                <Icon name="library" />
+            </button>
+        ) : null;
+
+        const sources =
+            props.showSource && values.sources.length > 1 ? (
+                <SourceSelect
+                    value={values.source}
+                    sources={values.sources}
+                    label={word('source')}
+                    disabled={disabled}
+                    onSelect={id => onCommand('source', id)}
+                />
+            ) : null;
+
         const info = (
             <div className="info">
                 {layout.name ? (
                     <div className="name">
-                        {values.name}
-                        {disabled ? ` · ${word('notAvailable')}` : ''}
+                        <span className="label">
+                            {values.name}
+                            {disabled ? ` · ${word('notAvailable')}` : ''}
+                        </span>
+                        {sources}
+                        {library}
                     </div>
                 ) : null}
                 <div className={`title${layout.titleLines > 1 ? ' two' : ''}`}>
