@@ -5,9 +5,7 @@
         "manual-review"
     ],
     "exec": {
-        "before_commit": [
-            "npm run build",
-            "npm run build:gui"
-        ]
+        "before_check": "npm run lint",
+        "before_commit": "npm run build"
     }
 }
