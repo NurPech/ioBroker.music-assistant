@@ -299,6 +299,7 @@ start/stop the instance manually from the Admin UI instead.
     ### **WORK IN PROGRESS**
 -->
 ### **WORK IN PROGRESS**
+- (copilot) Adapter requires node.js >= 22.19.0 now
 * (@GermanBluefox) Added the writable state `source` (`media.input`) to switch the source of a player, and the source selection in the web component and both widgets
 * (@GermanBluefox) Added the message `getMedia` (favorites, artists, albums, tracks, playlists, radio stations, podcasts and audiobooks of Music Assistant) and a library in the web component and both widgets to play from them
 * (@M1kad0) Fixed player and queue channels sharing or colliding in their object id when Music Assistant ids differ only in case or in replaced characters
