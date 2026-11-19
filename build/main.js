@@ -27,6 +27,7 @@ var import_ma_client = require("./lib/ma-client");
 var import_objects = require("./lib/objects");
 var import_media = require("./lib/media");
 var import_players = require("./lib/players");
+var import_help = require("./lib/help");
 const DOCKER_PORT = 8095;
 const DOCKER_USED_PORTS = [DOCKER_PORT, 8097];
 const MIN_PASSWORD_LENGTH = 8;
@@ -699,6 +700,10 @@ class MusicAssistant extends utils.Adapter {
   async onMessage(obj) {
     var _a;
     if (!(obj == null ? void 0 : obj.command) || !obj.callback) {
+      return;
+    }
+    if (obj.command === "help") {
+      this.sendTo(obj.from, obj.command, { help: import_help.HELP, commands: import_help.COMMANDS }, obj.callback);
       return;
     }
     if (obj.command === "getPlayers") {

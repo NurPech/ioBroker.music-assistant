@@ -32,6 +32,7 @@ import {
     toMediaEntry,
 } from './lib/media';
 import { type PlayerOption, playerOptions } from './lib/players';
+import { COMMANDS, HELP } from './lib/help';
 
 /** Port of the web interface and the API of the Music Assistant container (host network mode) */
 const DOCKER_PORT = 8095;
@@ -807,6 +808,11 @@ class MusicAssistant extends utils.Adapter {
      */
     private async onMessage(obj: ioBroker.Message): Promise<void> {
         if (!obj?.command || !obj.callback) {
+            return;
+        }
+        if (obj.command === 'help') {
+            // A description of all commands and states for AI agents and script authors, also while offline
+            this.sendTo(obj.from, obj.command, { help: HELP, commands: COMMANDS }, obj.callback);
             return;
         }
         if (obj.command === 'getPlayers') {
