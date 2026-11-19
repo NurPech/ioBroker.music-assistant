@@ -185,6 +185,13 @@ For every player queue, `music-assistant.0.queues.<queue_id>` gets:
 | `shuffleEnabled`, `repeatMode`                                        | Writable queue settings (`repeatMode`: 0 = off, 1 = all, 2 = one) |
 | `control.play` / `pause` / `playPause` / `stop` / `next` / `previous` | Writable control buttons |
 
+## Messages for scripts and AI agents
+
+`sendTo('music-assistant.0', 'help', {})` answers `{ help, commands }`: a description of the messages (`getPlayers`,
+`getMedia`) and of the states that control a player, for AI agents (e.g. pi-agent) and script authors, and the list
+of all commands with `write` (`true` if the command has an effect; all of them only read, a player is controlled by
+writing its states).
+
 ## Widgets for vis-2 and devices
 
 The player exists as a native widget of vis-2 and of the dashboard of ioBroker.devices, built like the SONOS widgets
@@ -298,6 +305,9 @@ start/stop the instance manually from the Admin UI instead.
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (@GermanBluefox) Added the message "help": a description of all messages for AI agents (e.g. pi-agent), and common.supportedMessages.help
+
 ### 0.3.0 (2026-11-17)
 - (copilot) Adapter requires node.js >= 22.19.0 now
 * (@GermanBluefox) Added the writable state `source` (`media.input`) to switch the source of a player, and the source selection in the web component and both widgets

@@ -139,6 +139,10 @@
       "config": "json"
     },
     "messagebox": true,
+    "supportedMessages": {
+      "help": true,
+      "custom": true
+    },
     "webComponents": [
       "webcomponents/ma-player.json"
     ],
